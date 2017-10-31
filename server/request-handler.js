@@ -1,29 +1,21 @@
+var results = [];
+
+var defaultCorsHeaders = {
+  'access-control-allow-origin': '*',
+  'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'access-control-allow-headers': 'content-type, accept',
+  'access-control-max-age': 10 // Seconds.
+};
+
 var requestHandler = function(request, response) {
   
   console.log('Serving request type ' + request.method + ' for url ' + request.url);
   
-  var results = [{
-    username: 'shawndrost',
-    text: 'trololo',
-    roomname: '4chan'
-  }, {
-    username: 'luis',
-    text: 'hello',
-    roomname: '4chan'
-  }];
-  
-  
-  var defaultCorsHeaders = {
-    'access-control-allow-origin': '*',
-    'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
-    'access-control-allow-headers': 'content-type, accept',
-    'access-control-max-age': 10 // Seconds.
-  };
   // See the note below about CORS headers.
   var headers = defaultCorsHeaders;
   headers['Content-Type'] = 'application/json';
   
-  if (request.method === 'OPTIONS'){
+  if (request.method === 'OPTIONS') {
     response.writeHead(200, headers);
     const responseBody = {headers, results};
     response.write(JSON.stringify(responseBody));
@@ -34,15 +26,16 @@ var requestHandler = function(request, response) {
   } else if (request.method === 'POST') {
     var body = '';
     request.on('data', function (chunk) {
-      body += chunk;
+      body = JSON.parse(chunk);
     });
     request.on('end', function() {
-      console.log('POSTED:' + body);
-      response.writeHead(201, headers);  
-      response.end();
+      results.push(body);
+      response.writeHead(201, headers); 
+      console.log(results); 
+      response.end(JSON.stringify(body));
     });  
   } else {
-//if the request.method is a get request
+    //if the request.method is a get request
   //send back all our data
   //send status code var statusCode = 200;
   // .writeHead() writes to the request line and headers of the response,
@@ -50,6 +43,7 @@ var requestHandler = function(request, response) {
     // response.writeHead(200, headers);
     response.writeHead(200, headers);  
     const responseBody = {headers, results};
+    console.log('completed!');
     response.end(JSON.stringify(responseBody));
 
   // Make sure to always call response.end() - Node may not send
