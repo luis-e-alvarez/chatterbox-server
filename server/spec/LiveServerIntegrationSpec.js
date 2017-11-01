@@ -72,6 +72,19 @@ describe('server', function() {
       done();
     });
   });
-
-
+    
+  it('should not clear previous data even after server closes', function(done) {
+    request('http://127.0.0.1:3000/classes/messages', function(error, response, body) {
+      var parsedBody = JSON.parse(body);
+      expect(parsedBody.results.length).to.not.equal(0);
+      done();
+    });
+  });
+    
+  it('Should not 404 when asked for an existent endpoint', function(done) {
+    request('http://127.0.0.1:3000/classes/messages', function(error, response, body) {
+      expect(response.statusCode).to.not.equal(404);
+      done();
+    });
+  });
 });
